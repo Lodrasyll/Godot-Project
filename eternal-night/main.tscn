@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://oa18uaacfeqq"]
+
+[ext_resource type="Script" uid="uid://c8jalovok8ka8" path="res://main.gd" id="1_main"]
+[ext_resource type="PackedScene" path="res://player/player.tscn" id="2_player"]
+[ext_resource type="Script" path="res://chunk_manager/chunk_manager.gd" id="3_chunk_manager"]
+
+[node name="Main" type="Node3D"]
+script = ExtResource("1_main")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+
+[node name="ChunkManager" type="Node3D" parent="."]
+script = ExtResource("3_chunk_manager")
+
+[node name="Player" parent="." instance=ExtResource("2_player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)

@@ -1,0 +1,11 @@
+[gd_scene format=3 uid="uid://dcmt0v2i3831m"]
+
+[ext_resource type="Texture2D" uid="uid://rjoybp7833cm" path="res://assets/pieces.png" id="1_3makh"]
+
+[node name="Piece" type="Node2D" unique_id=467978512]
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=38631332]
+scale = Vector2(3, 3)
+texture = ExtResource("1_3makh")
+region_enabled = true
+region_rect = Rect2(0, 0, 16, 16)

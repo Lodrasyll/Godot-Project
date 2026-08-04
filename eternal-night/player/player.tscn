@@ -1,0 +1,28 @@
+[gd_scene load_steps=5 format=3 uid="uid://player0000001"]
+
+[ext_resource type="Script" uid="uid://do1yjjjdk0ir" path="res://player/player.gd" id="1_player"]
+[ext_resource type="PackedScene" uid="uid://drfwdgtc5htdx" path="res://models/character_summer_final.glb" id="2_model"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_player"]
+radius = 0.5
+height = 2.0
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_player"]
+radius = 0.3
+
+[node name="Player" type="CharacterBody3D"]
+script = ExtResource("1_player")
+
+[node name="Model" parent="." instance=ExtResource("2_model")]
+transform = Transform3D(4, 0, 0, 0, 4, 0, 0, 0, 4, 0, -1, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("CapsuleShape3D_player")
+
+[node name="SpringArm3D" type="SpringArm3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+spring_length = 8.0
+shape = SubResource("SphereShape3D_player")
+margin = 0.5
+
+[node name="Camera3D" type="Camera3D" parent="SpringArm3D"]
