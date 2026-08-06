@@ -1,8 +1,10 @@
 [gd_scene format=3 uid="uid://dcmt0v2i3831m"]
 
 [ext_resource type="Texture2D" uid="uid://rjoybp7833cm" path="res://assets/pieces.png" id="1_3makh"]
+[ext_resource type="Script" uid="uid://b7v5f2hxjk0bj" path="res://scripts/piece.gd" id="1_tk1p6"]
 
 [node name="Piece" type="Node2D" unique_id=467978512]
+script = ExtResource("1_tk1p6")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=38631332]
 scale = Vector2(3, 3)

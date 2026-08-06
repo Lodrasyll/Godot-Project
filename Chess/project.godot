@@ -20,7 +20,7 @@ config/features=PackedStringArray("4.7")
 
 [autoload]
 
-Global="*uid://boa2qhg00r675"
+Globals="*uid://boa2qhg00r675"
 
 [display]
 
