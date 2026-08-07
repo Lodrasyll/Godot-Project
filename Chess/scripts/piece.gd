@@ -1,6 +1,6 @@
 extends Node2D
 
-@onready var piece_sprite = $Sprite2D
+@onready var piece_sprite = get_node("Sprite2D")
 
 const SPRITE_SIZE = 16
 const CELL_SIZE = 64
@@ -27,22 +27,28 @@ func init_piece(type: Globals.PIECE_TYPES, col: Globals.COLORS, board_pos: Vecto
 	
 	position = Vector2(
 		X_OFFSET + board_position[0] * CELL_SIZE,
-		Y_OFFSET + board_position[1] * CELL_SIZE
+		Y_OFFSET + board_position[1] * CELL_SIZE,
 	)
 	
 func update_piece_sprite():
 	if piece_sprite:
 		var region_pos = Globals.SPRITE_MAPPING[piece_color][piece_type] #根据字典的键来分配图片中的棋子
+		# region_rect 显示的图集纹理区域。[默认： Rect2(0, 0, 0, 0)] set_region_rect（值） setter get_region_rect() getter
 		piece_sprite.region_rect = Rect2(
-			region_pos.x * SPRITE_SIZE,
-			region_pos.y * SPRITE_SIZE,
-			SPRITE_SIZE,
-			SPRITE_SIZE
+			region_pos.x * SPRITE_SIZE, # 格子左上角的x像素
+			region_pos.y * SPRITE_SIZE, # 格子左上角的x像素
+			SPRITE_SIZE,				# 宽度（每个格子的像素宽度）
+			SPRITE_SIZE,				# 高度（每个格子的像素高度）
 		)
 		
-	
-	
-	
+
+func move_position(to_move: Vector2):
+	moved = true
+	board_position = to_move
+	position = Vector2(
+		X_OFFSET + board_position[0] * CELL_SIZE,
+		Y_OFFSET + board_position[1] * CELL_SIZE,
+	)
 	
 	
 	

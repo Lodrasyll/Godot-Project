@@ -7,7 +7,7 @@ extends Node2D
 @export var black_king_position: Vector2
 @export var white_king_position: Vector2
 
-const CELL_SIZE: int = 64
+const CELL_SIZE: int = 64 
 var board_offset = (DisplayServer.window_get_size().x - CELL_SIZE * 8) / 2
 
 # Called when the node enters the scene tree for the first time.
@@ -30,23 +30,43 @@ func draw_cell(x, y):
 	)
 	rect.z_index = -100
 	add_child(rect)
-	
-@export var INITIAL_PIECE_SET_SINGLE = Globals.INITIAL_PIECE_SET_SINGLE
+
 func init_pieces():
 	for piece_group in Globals.INITIAL_PIECE_SET_SINGLE:
 		var piece_type = piece_group[0]
 		var black_piece_pos = Vector2(piece_group[1], piece_group[2])
 		var white_piece_pos = Vector2(piece_group[1],  8 - 1 - piece_group[2])
-		##创建黑方棋子实例
+		
+		#创建黑方棋子实例
 		var black_piece = piece_scene.instantiate()
 		add_child(black_piece)
 		black_piece.init_piece(piece_type, Globals.COLORS.BLACK, black_piece_pos, self)
 		pieces.append(black_piece)
+		
 		#创建白方棋子实例
 		var white_piece = piece_scene.instantiate()
 		add_child(white_piece)
 		white_piece.init_piece(piece_type, Globals.COLORS.WHITE, white_piece_pos, self)
 		pieces.append(white_piece)
+		
+		if piece_type == Globals.PIECE_TYPES.KING:
+			resgiter_king(black_piece_pos, Globals.COLORS.BLACK)
+			resgiter_king(white_piece_pos, Globals.COLORS.WHITE)
+
+func resgiter_king(pos, col):
+	match col:
+		Globals.COLORS.BLACK:
+			black_king_position = pos
+		Globals.COLORS.WHITE:
+			white_king_position = pos
+
+func get_piece(pos: Vector2):
+	for piece in pieces:
+		if piece.board_position == pos:
+			print(piece.piece_type)
+			return piece
+	
+
 func _draw():
 	var BG = ColorRect.new()
 	BG.color = Color()

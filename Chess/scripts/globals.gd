@@ -1,7 +1,9 @@
 extends Node
 
+const CELL_SIZE = 64
+
 enum PLAYER { ONE, TWO }
-enum PLAYER_TYPE {
+enum PLAYER_2_TYPE {
 	HUMAN, AI
 }
 
