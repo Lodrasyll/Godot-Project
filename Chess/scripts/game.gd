@@ -7,7 +7,7 @@ var player2_type #
 
 # 拖动棋子
 var is_dragging: bool # 变量：是/否处于拖动状态
-var selected_piece = null
+var selected_piece: Piece = null
 var pervious_position = null # 能被接受的位置：棋子正确走法检测
 
 @onready var board = get_node("Board")
@@ -55,19 +55,43 @@ func get_pos_under_mouse():
 
 func drop_piece():
 	var to_move = get_pos_under_mouse()
-	if valid_move(selected_piece.position, to_move):
+	if valid_move(selected_piece.board_position, to_move):
 		# 对合法移动：
 		# - 如果目标点有棋子，那吃掉对方
 		var dest_piece = board.get_piece(to_move)
 		# 只能吃掉不同颜色方的棋子
-		if dest_piece != null and dest_piece.color != selected_piece.color:
-			board.delect_piece(dest_piece)
+		if dest_piece != null and dest_piece.piece_color != selected_piece.piece_color:
+			board.delete_piece(dest_piece) # 棋盘对象类下的删除棋子函数 参数是对象的棋子
 		
 		selected_piece.move_position(to_move)
 		# - 改变现在的活动棋方的状态
-		pass
-		return true	
+		status = Globals.COLORS.BLACK if status == Globals.COLORS.WHITE else Globals.COLORS.WHITE
+		return true
 	return false
 
 func valid_move(from_pos, to_pos):
+	var board_copy = board.clone()
+	var src_piece = board_copy.get_piece(from_pos)
+	
+	# 如果我们无法移动到被威胁的位置或可移动的位置
+	if (to_pos not in src_piece.get_moveable_positions() and 
+		to_pos not in src_piece.get_threatened_positions()
+	):
+		board_copy.queue_free() # 👈 清理临时棋盘
+		return false
+	
+	var dst_piece = board_copy.get_piece(to_pos)
+	if dst_piece != null:
+		board_copy.delete_piece(dst_piece)
+	src_piece.move_position(to_pos)
+	
+	# 检查当前方（指定颜色的棋子）是否未处于被将军（将军威胁）的状态
+	for piece in board_copy.pieces:
+		if status == Globals.COLORS.BLACK and board_copy.black_king_position in piece.get_threatened_positions():
+			board_copy.queue_free() # 👈 清理临时棋盘
+			return false
+		if status == Globals.COLORS.WHITE and board_copy.white_king_position in piece.get_threatened_positions():
+			board_copy.queue_free() # 👈 清理临时棋盘
+			return false
+	
 	return true

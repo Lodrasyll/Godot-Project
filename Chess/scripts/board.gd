@@ -14,6 +14,16 @@ var board_offset = (DisplayServer.window_get_size().x - CELL_SIZE * 8) / 2
 func _ready():
 	draw_board()
 	init_pieces()
+	
+func _draw():
+	var BG = ColorRect.new()
+	BG.color = Color()
+	BG.size = get_window().size
+	BG.z_index = -200
+	add_child(BG)
+	draw_rect(
+		Rect2(Vector2(board_offset, board_offset), Vector2(CELL_SIZE * 8, CELL_SIZE * 8)), 
+		Color(0.34, 0.542, 0.52, 1.0), false, 5)
 
 func draw_board():
 	for x in range(8): #range(8) 迭代器默认从0-7，提前处理好多一位的问题
@@ -49,11 +59,13 @@ func init_pieces():
 		white_piece.init_piece(piece_type, Globals.COLORS.WHITE, white_piece_pos, self)
 		pieces.append(white_piece)
 		
+		#print(JSON.stringify(pieces, "\t"))
+		
 		if piece_type == Globals.PIECE_TYPES.KING:
-			resgiter_king(black_piece_pos, Globals.COLORS.BLACK)
-			resgiter_king(white_piece_pos, Globals.COLORS.WHITE)
+			register_king(black_piece_pos, Globals.COLORS.BLACK)
+			register_king(white_piece_pos, Globals.COLORS.WHITE)
 
-func resgiter_king(pos, col):
+func register_king(pos, col):
 	match col:
 		Globals.COLORS.BLACK:
 			black_king_position = pos
@@ -63,16 +75,66 @@ func resgiter_king(pos, col):
 func get_piece(pos: Vector2):
 	for piece in pieces:
 		if piece.board_position == pos:
-			print(piece.piece_type)
 			return piece
-	
 
-func _draw():
-	var BG = ColorRect.new()
-	BG.color = Color()
-	BG.size = get_window().size
-	BG.z_index = -200
-	add_child(BG)
-	draw_rect(
-		Rect2(Vector2(board_offset, board_offset), Vector2(CELL_SIZE * 8, CELL_SIZE * 8)), 
-		Color(0.34, 0.542, 0.52, 1.0), false, 5)
+func delete_piece(piece):
+	for i in range(len(pieces)):
+		if pieces[i] == piece:
+			var popped = pieces.pop_at(i) # 移除并返回数组中位于 position 索引处的元素。
+			popped.queue_free() # 释放节点队列
+			return
+			
+func beam_search_threat(own_color, cur_x, cur_y, inc_x, inc_y):
+	# 按照给定的 X/Y 增量方向（inc_x/y）沿直线移动指针
+	# 以寻找受到威胁的棋子。
+	var threat_pos = []
+	
+	cur_x += inc_x
+	cur_y += inc_y
+	
+	# 沿增量方向持续移动，直到找到阻挡的棋子（或其他目标）
+	# 或超出棋盘范围
+	while cur_x >= 0 and cur_x < 8 and cur_y >= 0 and cur_y < 8:
+		var cur_pos = Vector2(cur_x, cur_y)
+		var cur_piece = get_piece(cur_pos)
+		if cur_piece != null: # 卫语句 防止空访问
+			if cur_piece.color != own_color:
+				threat_pos.append(cur_pos)
+			break
+		
+		threat_pos.append(cur_pos)
+		cur_x += inc_x
+		cur_y += inc_y
+	
+	return threat_pos
+
+func spot_search_threat(
+	own_color, cur_x, cur_y, inc_x, inc_y, threat_only = false, free_only = false
+):
+	# 执行单步移动，并检查该移动是否有效/合法。
+	cur_x += inc_x
+	cur_y += inc_y
+	
+	if cur_x >= 8 or cur_x < 0 or cur_y >= 8 or cur_y < 0:
+		return
+		
+	var cur_pos = Vector2(cur_x, cur_y)
+	var cur_piece = get_piece(cur_pos)
+	
+	if cur_piece != null:
+		if free_only:
+			return
+		return cur_pos if cur_piece.piece_color != own_color else null
+	return cur_pos if not threat_only else null
+
+
+func clone():
+	var board = self.duplicate()
+	
+	# ✅ 核心修复：给克隆棋盘一个全新的、干净的数组，彻底斩断与原棋盘的引用关系！
+	board.pieces = []
+	
+	for i in range(len(pieces)):
+		var piece = pieces[i].clone(board)
+		board.pieces.append(piece.clone(board)) # 把克隆的棋子塞进新数组里
+	return board
